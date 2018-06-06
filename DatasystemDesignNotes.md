@@ -258,3 +258,78 @@ Hver prosessor har et eget lokalt minne system.
 En type cluster er flere datamaskiner koblet sammen via et nettverk som kjører en software for å løse et større problem sammen. 
 
 Datasentere er også et eksempel på clusters. Der har vi datamaskiner og disker som er koblet sammen i stativer og deler strømforsyning og kjøling. 
+
+
+## Kapittel 8 Caches og virtual memory 
+
+### Temporal locality
+Går ut på at du lagrer nylig brukte instruksjoner i cachen ettersom at det er sannsynlig at du kommer til å bruke de igjen snart.
+
+### Spacial Locality 
+Når du henter en instruksjon henter du også med instruksjonene som ligger rundt/nærme ettersom at det er sannsynlig at du kommer til å få bruk for disse snart. 
+
+
+### Cache 
+
+En cache er som oftest bygget opp av SRAM (statisk RAM) på den samme chippen som prosessoren. Cache'n sin fart er lignende hastigheten som prosessoren. SRAM er meget dyrt. Hvis prosessoren etterspør informasjon og den ligger i cachen kaller vi dette en cache hit. Hvis ikke henter prosessoren dataen ut av hoved minnet som er bygger opp av DRAM. Hvis dataen ikke ligger i hoved minnet vil den hente den ut fra det virituelle minnet med HDD'er og SSD'er. 
+
+
+### Hvordan finner vi data i cachen
+
+Det er 3 forskjellige caching metoder. Direct mapped cache, N-way set associative cache og fully associative cache. 
+
+### Direct mapped cache
+Her har hvert sett én blokk. Data settes inn i cachen basert på en indeks, men ettersom at vi kan ende opp med like indekser må vi bruke noe som kalles tags. Tags definerer akkurat hvilken av adressene med lik indeks som ligger i cachen, så tagsene er på en måte ID'en til dataen. Problemet med denne caching måten er at to biter data med lik indeks vil alltid skape en konflikt. 
+
+### N-Way set associative cache
+Denne caching metoden reduserer konflikter ved å øke mengden blocks i settene. Data med lik indeks vil fortsatt havne i samme sett, men kan velge hvilken som helst av blokkene. Mindre konflikter men dyrere å bygge. Og man kommer også over å måtte gjøre avgjørelsen om hva som skal byttes ut når alle blokkene er full. 
+
+### Fully associative cache
+Denne cachen inneholder bare ett sett men med mange flere blocks/ways. Her må man sammenligne alle tagsene før en data request ettersom at dataen kan jo ligge i hvilken som helst blokk. Denne typen caching måte har minst konflikter men er dyrest grunnet mengden hardware som behøves. 
+
+### Block size 
+Vi øker block sizen til å være flere words for å kunne benytte spatial locality. 
+
+### Hvilken data blir erstattet
+Når cachene er fulle må man kaste noe ut før man kan sette ny data inn. Derfor fjerner man Least Recently Used(LRU) dataen. Et least recently used set markeres med en bit U. Og hvis dette settet har flere blokker fjerner vi en tilfeldig en. 
+
+### Multiple level caches
+Ofte har moderne systemer flere nivåer av cacher. Dette er som oftest for å redusere overall access time. 
+
+### Reducing miss rate
+Ved å tweake på parameterene block size, associativity capacity osv kan vi redusere typer misser. Men det kan oppstå situasjoner hvor når vi reduserer en type miss øker vi den andre så vi må teste hvilken kombinasjon som gir minst misses overall. 
+
+
+### Write policy
+Cacher er enten definert som writethrough eller writeback cacher. 
+
+Ved write through cacher så blir data skrevet til en cache blokk skrevet til hovedminnet i samme slengen. Bruker mer minne writes enn writeback. 
+
+Ved writeback cacher blir en dirty bit D assosiert med hver block i cachen. Denne biten er 1 når blokken har blitt skrevet og 0 ellers. Dirty cache blokker skriver bare til hovedminnet når de blir kastet ut. Mest brukt. 
+
+## Virtual Memory
+HDD'er og SSD'er er virituelle minner. Disse er store, billige som er veldig trege. Programmer kan få tak i data hvor som helst i det virituelle minnet. Så for at programmene skal få tak i rett data må de bruke noe som kalles virituelle adresser. Istedet for blokker bruker virituelle minner noe som kalles pages og hovedminnet bruker fysiske pages. En virituell page kan både være i det virituelle og fysiske minnet. For å finne ut av hvilken fysisk adresse en virituell page i fysisk minne har bruker vi adress translation. 
+
+### The page table 
+Prosessoren bruker en page table for å oversette mellom virituelle og fysiske adresser. Tabellen har en Valid bit som sier om den virituelle adressen peker til en fysisk adresse eller ikke. Denne tabellen lagres i det fysiske minnet. 
+
+## Translation lookaside buffer
+Er en liten cache som benyttes for å lagre sider av page tabellen. Prosessoren titter i denne cachen før den sjekker tabellen i det fysiske minnet. en TLB er fully associative.
+
+### Memory protection
+Er et prinsipp hvor hver prosess får tildelt et satt område og kan bruke så mye av dataen i det området som de vil. Og de skal ikke få tilgang til andre prosesser sine områder uten tillatelse. Et program kan bare få tilgang til fysiske adresser som er i sin page tabel
+
+
+### Amdahls lov
+Sier at en ressurser brukt på å øke ytelsen til et subsystem er bare verdt det hvis subsystemet påvirker en stor del av systemet i sin overall performance. 
+
+F.eks vil ikke forbedringer av minne gjøre programmet særlig mye bedre hvis det består av hovedsaklig Write/Read instruksjoner.
+
+### Moores lov
+Mengden transistorer vi får plass på et areal vil doble seg annenhvert år. Noe som vil medføre reduserte kostnader. 
+Dette var sant veldig lenge men nå sakker utviklingen seg litt, pluss at vi får problem med varme
+
+### Dennard scaling
+Sier at selv om transistorer minsker i størrelse vil power densityen forbli konstant. Så strøm og spenning vil være proposjonale med størrelsen.  
+
+
